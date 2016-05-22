@@ -1,16 +1,25 @@
 #!/usr/bin/python
 
+#
+# node2csv (version 1.2)
+# Alejandro Calderon @ ARCOS.INF.UC3M.ES
+# GPL 3.0
+#
+
 import math
 import time
 import psutil
 import threading
 import multiprocessing
 import subprocess
-import sys, getopt
+import sys
+import getopt
 
 
 def mon():
-        global last_info_m_time, last_info_m_usage, last_info_c_time, last_info_c_usage
+        global last_info_m_time, last_info_m_usage
+        global last_info_c_time, last_info_c_usage
+        global last_info_n_time, last_info_n_usage
 
         # 1.- Get data
 	info_time      = time.time() 
@@ -20,7 +29,10 @@ def mon():
         info_m_usage = meminfo[2]
 
 	cpuinfo = psutil.cpu_percent()
-        info_c_usage = cpuinfo ;
+        info_c_usage = cpuinfo 
+
+        netinfo = psutil.net_io_counters()
+        info_n_usage = netinfo.bytes_sent + netinfo.bytes_recv
 
         # 2.- Check delta
         info_delta = math.fabs(info_m_usage - last_info_m_usage) 
@@ -53,6 +65,16 @@ def mon():
 
             last_info_c_time  = info_time
             last_info_c_usage = info_c_usage
+
+        # send + receive
+        info_delta = math.fabs(info_n_usage - last_info_n_usage) / (last_info_n_usage + 1)
+        if info_delta >= delta:
+	    print '"network";"' + '{:.9f}'.format(info_timestamp) + '";"' + \
+                                   str(info_time - last_info_n_time) + '";"' + \
+                                   str(last_info_n_usage) + '"'
+
+            last_info_n_time  = info_time
+            last_info_n_usage = info_n_usage
 
         # 3.- Set next checking...
 	threading.Timer(rrate, mon).start()
@@ -88,11 +110,13 @@ last_info_m_time  = 0.0
 last_info_m_usage = 0.0
 last_info_c_time  = 0.0
 last_info_c_usage = 0.0
+last_info_n_time  = 0.0
+last_info_n_usage = 0.0
 
 start_time = time.time()
 
 rrate = 1.0 
-delta = 0.0
+delta = 0.5
 
 if __name__ == "__main__":
    main(sys.argv[1:])

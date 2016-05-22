@@ -1,5 +1,11 @@
 #!/usr/bin/python
 
+#
+# strace2csv (version 2.1)
+# Alejandro Calderon @ ARCOS.INF.UC3M.ES
+# GPL 3.0
+#
+
 # 
 # Import packages
 # 
