@@ -137,9 +137,9 @@ last_info_n_usage = 0.0
 start_time = time.time()
 
 format = 'csv'
-rrate = 1.0 
-delta = 0.5
-p_id  = os.getpid()
+rrate  = 1.0 
+delta  = 0.5
+p_id   = os.getpid()
 
 if __name__ == "__main__":
    try:

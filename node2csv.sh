@@ -16,10 +16,22 @@ import sys
 import getopt
 
 
+def print_record ( format, data ):
+        if (format == 'json'):
+            print data
+
+        if (format == 'csv'):
+            for item in data:
+                if item != 'type':
+                   sys.stdout.write('"' + str(data[item]) + '";')
+            print '"' + data['type'] + '"'
+
+
 def mon():
         global last_info_m_time, last_info_m_usage
         global last_info_c_time, last_info_c_usage
         global last_info_n_time, last_info_n_usage
+        global format
 
         # 1.- Get data
 	info_time      = time.time() 
@@ -37,9 +49,11 @@ def mon():
         # 2.- Check delta
         info_delta = math.fabs(info_m_usage - last_info_m_usage) 
         if info_delta >= delta:
-	    print '"memory";"' + '{:.9f}'.format(info_timestamp) + '";"' + \
-                                 str(info_time - last_info_m_time) + '";"' + \
-                                 str(last_info_m_usage) + '"'
+            data = { "type":      "memory", 
+                     "timestamp": info_timestamp,
+                     "timedelta": info_time - last_info_m_time,
+                     "usage":     last_info_m_usage } ; 
+            print_record(format, data)
 
             last_info_m_time  = info_time
             last_info_m_usage = info_m_usage
@@ -57,11 +71,13 @@ def mon():
                     info_cpufreq = info_cpufreq + float(line.split(":")[1])
             info_cpufreq = info_cpufreq / info_ncores
 
-	    print '"compute";"' + '{:.9f}'.format(info_timestamp) + '";"' + \
-                                  str(info_cpufreq) + '";"' + \
-                                  str(info_time - last_info_c_time) + '";"' + \
-                                  str(last_info_c_usage) + '";"' + \
-                                  str(info_ncores) + '"'
+            data = { "type":      "compute", 
+                     "timestamp": info_timestamp,
+                     "cpufreq":   info_cpufreq,
+                     "timedelta": info_time - last_info_c_time,
+                     "usage":     last_info_c_usage,
+                     "ncores":    info_ncores } ; 
+            print_record(format, data)
 
             last_info_c_time  = info_time
             last_info_c_usage = info_c_usage
@@ -69,9 +85,11 @@ def mon():
         # send + receive
         info_delta = math.fabs(info_n_usage - last_info_n_usage) / (last_info_n_usage + 1)
         if info_delta >= delta:
-	    print '"network";"' + '{:.9f}'.format(info_timestamp) + '";"' + \
-                                   str(info_time - last_info_n_time) + '";"' + \
-                                   str(last_info_n_usage) + '"'
+            data = { "type":      "network", 
+                     "timestamp": info_timestamp,
+                     "timedelta": info_time - last_info_n_time,
+                     "usage":     last_info_n_usage } ; 
+            print_record(format, data)
 
             last_info_n_time  = info_time
             last_info_n_usage = info_n_usage
@@ -81,25 +99,27 @@ def mon():
 
 
 def main(argv):
-        global rrate, delta 
+        global format, rrate, delta 
 
         # get parameters
         try:
-           opts, args = getopt.getopt(argv,"hr:hd:",["rate=","delta="])
+           opts, args = getopt.getopt(argv,"hf:hr:hd:",["format=","rate=","delta="])
         except getopt.GetoptError:
-           print 'node2csv.sh -r <rate> -d <delta>'
+           print 'node2csv.sh -f <format> -r <rate> -d <delta>'
            sys.exit(2)
 
         for opt, arg in opts:
             if opt == '-h':
-               print 'node2csv.sh -r <rate> -d <delta>'
+               print 'node2csv.sh -f <format> -r <rate> -d <delta>'
                sys.exit()
+            elif opt in ("-f", "--format"):
+               format  = str(arg)
             elif opt in ("-r", "--rate"):
                rrate = arg
             elif opt in ("-d", "--delta"):
                delta = arg
 
-	# start simulation
+	# start monitoring
 	mon()
 
 
@@ -113,8 +133,9 @@ last_info_n_usage = 0.0
 
 start_time = time.time()
 
-rrate = 1.0 
-delta = 0.5
+format = 'csv'
+rrate  = 1.0 
+delta  = 0.5
 
 if __name__ == "__main__":
    main(sys.argv[1:])
