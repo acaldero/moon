@@ -20,8 +20,7 @@ import getopt
 
 def print_records ( format, data ):
         if (format == 'json'):
-            for y in data:
- 	        print y
+            print data
 
         if (format == 'csv'):
             for y in data:

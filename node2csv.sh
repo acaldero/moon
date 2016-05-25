@@ -18,7 +18,7 @@ import getopt
 
 def print_record ( format, data ):
         if (format == 'json'):
-            print data
+            print data 
 
         if (format == 'csv'):
             for item in data:
