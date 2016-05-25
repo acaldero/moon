@@ -39,9 +39,9 @@ def strace2info():
 	# 
 
 	an = {} 
-	an[0] = '"stdin"'
-	an[1] = '"stdout"'
-	an[2] = '"stderr"'
+	an[0] = 'stdin'
+	an[1] = 'stdout'
+	an[2] = 'stderr'
 
 	ak = {} 
 	ak[0] = ak[1] = ak[2] = 'disk'
@@ -76,14 +76,15 @@ def strace2info():
 		except KeyError:
 		   continue
 
+		l_name = x[1].replace("\"","")
                 data = { "type":      "disk", 
                          "date":      l_date,
-                         "x_2":       x[len(x)-2],
+                         "duration":  x[len(x)-2],
                          "op":        l_op,
-                         "x1":        x[1] } ; 
+                         "name":      l_name } ; 
 
 		ak[key] = 'disk'
-		an[key] = x[1] 
+		an[key] = l_name
 		ao[key] = [ data ]
 
 
@@ -93,14 +94,15 @@ def strace2info():
 		except ValueError:
 		   continue
 
+		l_name = x[2].replace("\"","")
                 data = { "type":      "disk", 
                          "date":      l_date,
-                         "x_2":       x[len(x)-2],
+                         "duration":  x[len(x)-2],
                          "op":        l_op,
-                         "x2":        x[2] } ; 
+                         "name":      l_name } ; 
 
 		ak[key] = 'disk'
-		an[key] = x[2] 
+		an[key] = l_name
 		ao[key] = [ data ]
 
 
@@ -168,7 +170,7 @@ def strace2info():
                             "date":      l_date,
                             "duration":  x[-2],
                             "op":        l_op,
-                            "key":       str(an[key]),
+                            "name":      an[key],
                             "dest":      l_dest } ; 
 		except ValueError:
 		   continue
@@ -186,7 +188,7 @@ def strace2info():
                             "date":      l_date,
                             "duration":  x[-2],
                             "op":        l_op,
-                            "an_key":    str(an[key]) } ; 
+                            "name":      an[key] } ; 
 		except ValueError:
 		   continue
 
@@ -208,7 +210,7 @@ def strace2info():
                          "date":      l_date,
                          "duration":  x[-2],
                          "op":        l_op,
-                         "an_key":    str(an[key]),
+                         "name":      an[key],
                          "amount":    x[len(x)-3] } ; 
 		ao[key] += [ data ]
 
@@ -228,7 +230,7 @@ def strace2info():
                          "date":      l_date,
                          "duration":  x[-2],
                          "op":        l_op,
-                         "an_key":    str(an[key]),
+                         "name":      an[key],
                          "amount":    x[len(x)-3] } ; 
 		ao[key] += [ data ]
 
@@ -243,14 +245,11 @@ def strace2info():
 		   if key not in ao:
 		      continue
 
-		   l_name = str(an[key])
-		   l_name = l_name.replace("\"","")
-
                    data = { "type":      ak[key], 
                             "date":      l_date,
                             "duration":  x[-2],
                             "op":        l_op,
-                            "name":      l_name } ; 
+                            "name":      an[key] } ; 
 		except ValueError:
 		   continue
 		except KeyError:
