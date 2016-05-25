@@ -98,8 +98,6 @@ def main(argv):
                rrate = arg
             elif opt in ("-d", "--delta"):
                delta = arg
-        # print 'rrate "', rrate
-        # print 'delta "', delta
 
 	# start simulation
 	mon()
