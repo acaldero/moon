@@ -28,6 +28,8 @@ def print_record ( format, data ):
                    sys.stdout.write('"' + str(data[item]) + '";')
             print '"' + data['type'] + '"'
 
+        sys.stdout.flush()
+
 
 def mon ():
         global last_info_m_time, last_info_m_usage
