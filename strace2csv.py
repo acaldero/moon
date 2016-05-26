@@ -6,16 +6,13 @@
 # GPL 3.0
 #
 
-# 
-# Import packages
-# 
-
 import os 
 import re 
 import sys
 import math
 import time
 import getopt
+import json
 
 
 def print_records ( format, data ):
@@ -274,7 +271,7 @@ def main(argv):
 
         # get parameters
         try:
-           opts, args = getopt.getopt(argv,"hf",["format="])
+           opts, args = getopt.getopt(argv,"h:f",["format="])
         except getopt.GetoptError:
            print 'strace2csv.sh -f <format>'
            sys.exit(2)
