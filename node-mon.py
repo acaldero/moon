@@ -19,7 +19,7 @@ import json
 
 def print_record ( format, data ):
         if (format == 'json'):
-            print(data)
+            print(json.dumps(data))
 
         if (format == 'csv'):
             for item in data:

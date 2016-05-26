@@ -17,7 +17,7 @@ import json
 
 def print_records ( format, data ):
         if (format == 'json'):
-            print data
+            print(json.dumps(data))
 
         if (format == 'csv'):
             for y in data:
