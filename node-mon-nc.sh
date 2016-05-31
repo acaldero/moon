@@ -13,6 +13,6 @@ fi
                                             print ""; 
                                           } 
                                           { 
-                                            print "data: " $0; 
+                                            print "data: " $0 "\n";
                                             fflush(); 
                                           }' | nc -l -p $1
