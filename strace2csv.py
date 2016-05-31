@@ -278,7 +278,7 @@ def main(argv):
 
         for opt, arg in opts:
             if opt == '-h':
-               print 'app2csv.sh -f <format>'
+               print 'strace2csv.sh -f <format>'
                sys.exit()
             elif opt in ("-f", "--format"):
                format  = str(arg)

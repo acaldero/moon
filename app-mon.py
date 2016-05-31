@@ -106,12 +106,12 @@ def main(argv):
         try:
            opts, args = getopt.getopt(argv,"h:f:r:d:p",["format=","rate=","delta=","pid="])
         except getopt.GetoptError:
-           print 'app2csv.sh -f <format> -r <rate> -d <delta> -p <pid>'
+           print 'app-mon.sh -f <format> -r <rate> -d <delta> -p <pid>'
            sys.exit(2)
 
         for opt, arg in opts:
             if opt == '-h':
-               print 'app2csv.sh -f <format> -r <rate> -d <delta> -p <pid>'
+               print 'app-mon.sh -f <format> -r <rate> -d <delta> -p <pid>'
                sys.exit()
             elif opt in ("-f", "--format"):
                format  = str(arg)
@@ -148,5 +148,5 @@ if __name__ == "__main__":
    try:
        main(sys.argv[1:])
    except psutil.NoSuchProcess:
-       print "app2csv: the execution of process with pid '" + str(p_id) + "' has ended."
+       print "app-mon: the execution of process with pid '" + str(p_id) + "' has ended."
 
