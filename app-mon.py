@@ -130,14 +130,14 @@ def main(argv):
 
 
 # initial values
-last_info_m_time  = 0.0
-last_info_m_usage = 0.0
-last_info_c_time  = 0.0
-last_info_c_usage = 0.0
-last_info_n_time  = 0.0
-last_info_n_usage = 0.0
-
 start_time = time.time()
+
+last_info_m_time  = start_time
+last_info_m_usage = 0.0
+last_info_c_time  = start_time
+last_info_c_usage = 0.0
+last_info_n_time  = start_time
+last_info_n_usage = 0.0
 
 format = 'csv'
 rrate  = 1.0 
