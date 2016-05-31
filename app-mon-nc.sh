@@ -1,11 +1,11 @@
 #!/bin/sh
 
 if [ $# -ne 1 ]; then
-   echo "Usage: $0 <port>"
+   echo "Usage: $0 <port> <pid>"
    exit
 fi
 
-./node-mon.py -f json -d 0.3 | awk 'BEGIN { 
+./app-mon.py -f json -d 0.3 -p $2 | awk 'BEGIN { 
                                             print "HTTP/1.1 200 OK"; 
                                             print "Access-Control-Allow-Origin: *"; 
                                             print "Content-Type: text/event-stream"; 
