@@ -130,7 +130,7 @@ def main(argv):
         p_obj = psutil.Process(p_id)
 
 	# start simulation
-	mon()
+	threading.Timer(rrate, mon).start()
 
 
 # initial values

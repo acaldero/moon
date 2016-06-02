@@ -127,7 +127,7 @@ def main(argv):
                delta = float(arg)
 
 	# start monitoring
-	mon()
+	threading.Timer(rrate, mon).start()
 
 
 # initial values
