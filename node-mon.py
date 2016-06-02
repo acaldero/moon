@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #
-# node monitoring (version 1.2)
+# node monitoring (version 1.3)
 # Alejandro Calderon @ ARCOS.INF.UC3M.ES
 # GPL 3.0
 #
@@ -41,8 +41,7 @@ def mon():
         global format
 
         # 1.- Get data
-	info_time      = time.time() 
-	info_timestamp = info_time - start_time
+	info_time = time.time() 
 
 	meminfo = psutil.virtual_memory()
         info_m_usage = meminfo[2]
@@ -51,13 +50,13 @@ def mon():
         info_c_usage = cpuinfo 
 
         netinfo = psutil.net_io_counters()
-        info_n_usage = netinfo.bytes_sent + netinfo.bytes_recv
+        info_n_usage = (netinfo.bytes_sent + netinfo.bytes_recv) / (1024*1024)
 
         # 2.- Check delta
         info_delta = math.fabs(info_m_usage - last_info_m_usage) 
         if info_delta >= delta:
             data = { "type":      "memory", 
-                     "timestamp": info_timestamp,
+                     "timestamp": info_time,
                      "timedelta": info_time - last_info_m_time,
                      "usage":     last_info_m_usage } ; 
             print_record(format, data)
@@ -79,7 +78,7 @@ def mon():
             info_cpufreq = info_cpufreq / info_ncores
 
             data = { "type":      "compute", 
-                     "timestamp": info_timestamp,
+                     "timestamp": info_time,
                      "cpufreq":   info_cpufreq,
                      "timedelta": info_time - last_info_c_time,
                      "usage":     last_info_c_usage,
@@ -90,10 +89,10 @@ def mon():
             last_info_c_usage = info_c_usage
 
         # send + receive
-        info_delta = math.fabs(info_n_usage - last_info_n_usage) / (last_info_n_usage + 1)
+        info_delta = 100 * math.fabs(info_n_usage - last_info_n_usage) / (last_info_n_usage + 1)
         if info_delta >= delta:
             data = { "type":      "network", 
-                     "timestamp": info_timestamp,
+                     "timestamp": info_time,
                      "timedelta": info_time - last_info_n_time,
                      "usage":     last_info_n_usage } ; 
             print_record(format, data)
@@ -134,11 +133,16 @@ def main(argv):
 start_time = time.time()
 
 last_info_m_time  = start_time
-last_info_m_usage = 0.0
+meminfo = psutil.virtual_memory()
+last_info_m_usage = meminfo[2]
+
 last_info_c_time  = start_time
-last_info_c_usage = 0.0
+cpuinfo = psutil.cpu_percent()
+last_info_c_usage = cpuinfo 
+
 last_info_n_time  = start_time
-last_info_n_usage = 0.0
+netinfo = psutil.net_io_counters()
+last_info_n_usage = (netinfo.bytes_sent + netinfo.bytes_recv) / (1024*1024*1024)
 
 format = 'csv'
 rrate  = 1.0 

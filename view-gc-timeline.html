@@ -12,7 +12,6 @@
 	    var container = null ;
 
 	    var jsonStream = null ;
-            var start_time = 0 ;
             var options = {
                    timeline: { colorByRowLabel: true }
                 };
@@ -32,8 +31,8 @@
 	    {
 		var elto_mon = JSON.parse(event.data); 
 
-                var starting_time = new Date(start_time + 1000*elto_mon.timestamp - 1000*elto_mon.timedelta) ;
-                var ending_time   = new Date(start_time + 1000*elto_mon.timestamp) ;
+                var starting_time = new Date(1000*elto_mon.timestamp - 1000*elto_mon.timedelta) ;
+                var ending_time   = new Date(1000*elto_mon.timestamp) ;
 		dataTable.addRow([ elto_mon.type, elto_mon.usage.toString(10), starting_time, ending_time ]);
 
 	        var chart = new google.visualization.Timeline(container) ;
@@ -45,7 +44,6 @@
                 if (null != jsonStream)
                     return;
 
-                start_time = Date.now() ;
 		jsonStream = new EventSource(url) ;
                 jsonStream.addEventListener('error', function (e) { alert('Unable to connect: ' + url); }, false) ;
                 jsonStream.addEventListener('message', onMessageHandler) ;
@@ -56,7 +54,6 @@
                 if (null == jsonStream)
                     return;
 
-                start_time = 0 ;
                 jsonStream.close() ;
                 jsonStream = null ;
 	    }

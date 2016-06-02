@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #
-# application monitoring (version 1.2)
+# application monitoring (version 1.3)
 # Alejandro Calderon @ ARCOS.INF.UC3M.ES
 # GPL 3.0
 #
@@ -43,7 +43,6 @@ def mon ():
 
         # 1.- Get data
 	info_time      = time.time() 
-	info_timestamp = info_time - start_time
 
 	meminfo = p_obj.memory_percent()
         info_m_usage = meminfo
@@ -58,10 +57,13 @@ def mon ():
         info_delta = math.fabs(info_m_usage - last_info_m_usage) 
         if info_delta >= delta:
             data = { "type":      "memory", 
-                     "timestamp": info_timestamp,
+                     "timestamp": info_time,
                      "timedelta": info_time - last_info_m_time,
                      "usage":     last_info_m_usage } ; 
-            print_record(format, data)
+
+            if last_info_m_usage != 0:
+               print_record(format, data)
+
             last_info_m_time  = info_time
             last_info_m_usage = info_m_usage
 
@@ -79,12 +81,15 @@ def mon ():
             info_cpufreq = info_cpufreq / info_ncores
 
             data = { "type":      "compute", 
-                     "timestamp": info_timestamp,
+                     "timestamp": info_time,
                      "cpufreq":   info_cpufreq,
                      "timedelta": info_time - last_info_c_time,
                      "usage":     last_info_c_usage,
                      "ncores":    info_ncores } ; 
-            print_record(format, data)
+
+            if last_info_c_usage != 0:
+               print_record(format, data)
+
             last_info_c_time  = info_time
             last_info_c_usage = info_c_usage
 
@@ -92,10 +97,13 @@ def mon ():
         info_delta = math.fabs(info_n_usage - last_info_n_usage)
         if info_delta > 0:
             data = { "type":      "network", 
-                     "timestamp": info_timestamp,
+                     "timestamp": info_time,
                      "timedelta": info_time - last_info_n_time,
                      "usage":     last_info_n_usage } ; 
-            print_record(format, data)
+
+            if last_info_n_usage != 0:
+               print_record(format, data)
+
             last_info_n_time  = info_time
             last_info_n_usage = info_n_usage
 
@@ -137,11 +145,16 @@ def main(argv):
 start_time = time.time()
 
 last_info_m_time  = start_time
-last_info_m_usage = 0.0
+meminfo = p_obj.memory_percent()
+last_info_m_usage = meminfo
+
 last_info_c_time  = start_time
-last_info_c_usage = 0.0
+cpuinfo = p_obj.cpu_percent()
+last_info_c_usage = cpuinfo 
+
 last_info_n_time  = start_time
-last_info_n_usage = 0.0
+netinfo = p_obj.connections()
+last_info_n_usage = len(netinfo)
 
 format = 'csv'
 rrate  = 1.0 
