@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #
-# node monitoring (version 1.3)
+# Node Monitoring (version 1.5)
 # Alejandro Calderon @ ARCOS.INF.UC3M.ES
 # GPL 3.0
 #
@@ -38,33 +38,31 @@ def mon():
         global last_info_m_time, last_info_m_usage
         global last_info_c_time, last_info_c_usage
         global last_info_n_time, last_info_n_usage
+        global last_info_d_time, last_info_d_usage
         global format
 
-        # 1.- Get data
 	info_time = time.time() 
 
+        # 1.- Check Memory
 	meminfo = psutil.virtual_memory()
         info_m_usage = meminfo[2]
 
-	cpuinfo = psutil.cpu_percent()
-        info_c_usage = cpuinfo 
-
-        netinfo = psutil.net_io_counters()
-        info_n_usage = (netinfo.bytes_sent + netinfo.bytes_recv) / (1024*1024)
-
-        # 2.- Check delta
         info_delta = math.fabs(info_m_usage - last_info_m_usage) 
         if info_delta >= delta:
-            data = { "type":      "memory", 
-                     "timestamp": info_time,
-                     "timedelta": info_time - last_info_m_time,
-                     "usage":     last_info_m_usage } ; 
+            data = { "type":          "memory", 
+                     "timestamp":     info_time,
+                     "timedelta":     info_time - last_info_m_time,
+                     "usagepercent":  last_info_m_usage,
+                     "usageabsolute": meminfo[0] - meminfo[1] } ; 
             print_record(format, data)
 
             last_info_m_time  = info_time
             last_info_m_usage = info_m_usage
 
-        # CPU freq * time * CPU usage * # cores
+        # 2.- Check CPU 
+	cpuinfo = psutil.cpu_percent()
+        info_c_usage = cpuinfo 
+
         info_delta = math.fabs(info_c_usage - last_info_c_usage)
         if info_delta >= delta:
             info_ncores  = multiprocessing.cpu_count()
@@ -77,30 +75,50 @@ def mon():
                     info_cpufreq = info_cpufreq + float(line.split(":")[1])
             info_cpufreq = info_cpufreq / info_ncores
 
-            data = { "type":      "compute", 
-                     "timestamp": info_time,
-                     "cpufreq":   info_cpufreq,
-                     "timedelta": info_time - last_info_c_time,
-                     "usage":     last_info_c_usage,
-                     "ncores":    info_ncores } ; 
+            # CPU freq * time * CPU usage * # cores
+            data = { "type":          "compute", 
+                     "timestamp":     info_time,
+                     "cpufreq":       info_cpufreq,
+                     "timedelta":     info_time - last_info_c_time,
+                     "usagepercent":  last_info_c_usage,
+                     "usageabsolute": info_cpufreq * (info_time - last_info_c_time) * last_info_c_usage * info_ncores,
+                     "ncores":        info_ncores } ; 
             print_record(format, data)
 
             last_info_c_time  = info_time
             last_info_c_usage = info_c_usage
 
-        # send + receive
+        # 3.- Check Network
+        netinfo = psutil.net_io_counters()
+        info_n_usage = (netinfo.bytes_sent + netinfo.bytes_recv) / (1024*1024)
+
         info_delta = 100 * math.fabs(info_n_usage - last_info_n_usage) / (last_info_n_usage + 1)
         if info_delta >= delta:
-            data = { "type":      "network", 
-                     "timestamp": info_time,
-                     "timedelta": info_time - last_info_n_time,
-                     "usage":     last_info_n_usage } ; 
+            data = { "type":           "network", 
+                     "timestamp":      info_time,
+                     "timedelta":      info_time - last_info_n_time,
+                     "usageabsolute":  last_info_n_usage } ; 
             print_record(format, data)
 
             last_info_n_time  = info_time
             last_info_n_usage = info_n_usage
 
-        # 3.- Set next checking...
+        # 4.- Check Disk
+        diskinfo = psutil.disk_io_counters()
+        info_d_usage = (diskinfo.read_bytes + diskinfo.write_bytes) / (1024*1024)
+
+        info_delta = 100 * math.fabs(info_d_usage - last_info_d_usage) / (last_info_d_usage + 1)
+        if info_delta >= delta:
+            data = { "type":           "disk", 
+                     "timestamp":      info_time,
+                     "timedelta":      info_time - last_info_d_time,
+                     "usageabsolute":  last_info_d_usage } ; 
+            print_record(format, data)
+
+            last_info_d_time  = info_time
+            last_info_d_usage = info_d_usage
+
+        # 5.- Set next checking...
 	threading.Timer(rrate, mon).start()
 
 
@@ -143,6 +161,10 @@ last_info_c_usage = cpuinfo
 last_info_n_time  = start_time
 netinfo = psutil.net_io_counters()
 last_info_n_usage = (netinfo.bytes_sent + netinfo.bytes_recv) / (1024*1024*1024)
+
+last_info_d_time  = start_time
+diskinfo = psutil.disk_io_counters()
+last_info_d_usage = (diskinfo.read_bytes + diskinfo.write_bytes) / (1024*1024)
 
 format = 'csv'
 rrate  = 1.0 

@@ -33,7 +33,18 @@
 
                 var starting_time = new Date(1000*elto_mon.timestamp - 1000*elto_mon.timedelta) ;
                 var ending_time   = new Date(1000*elto_mon.timestamp) ;
-		dataTable.addRow([ elto_mon.type, elto_mon.usage.toString(10), starting_time, ending_time ]);
+
+                var usage_hr = 'unknown' ;
+                if ("compute" == elto_mon.type)
+                         usage_hr =  elto_mon.usagepercent + '%';
+                else if (elto_mon.usageabsolute > 1024*1024)
+                         usage_hr = Math.floor(elto_mon.usageabsolute / (1024*1024)) + ' MiB';
+                else if (elto_mon.usageabsolute > 1024)
+                         usage_hr = Math.floor(elto_mon.usageabsolute / (1024)) + ' KiB';
+                else if (elto_mon.usageabsolute < 1024)
+                         usage_hr = Math.floor(elto_mon.usageabsolute) + ' bytes';
+
+		dataTable.addRow([ elto_mon.type, usage_hr, starting_time, ending_time ]);
 
 	        var chart = new google.visualization.Timeline(container) ;
 		chart.draw(dataTable, options) ;
@@ -45,7 +56,11 @@
                     return;
 
 		jsonStream = new EventSource(url) ;
-                jsonStream.addEventListener('error', function (e) { alert('Unable to connect: ' + url); }, false) ;
+                jsonStream.addEventListener('error', 
+                                            function (e) { 
+                                                alert('Unable to connect: ' + url); 
+                                                StopDrawing(); 
+                                            }, false) ;
                 jsonStream.addEventListener('message', onMessageHandler) ;
 	    }
 
