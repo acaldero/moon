@@ -19,16 +19,20 @@ import json
 
 
 def print_record ( format, data ):
-        if (format == 'json'):
-            print(json.dumps(data))
+        try:
+            if (format == 'json'):
+                print(json.dumps(data))
 
-        if (format == 'csv'):
-            for item in data:
-                if item != 'type':
-                   sys.stdout.write('"' + str(data[item]) + '";')
-            print '"' + data['type'] + '"'
+            if (format == 'csv'):
+                for item in data:
+                    if item != 'type':
+                       sys.stdout.write('"' + str(data[item]) + '";')
+                print '"' + data['type'] + '"'
 
-        sys.stdout.flush()
+            sys.stdout.flush()
+
+        except IOError, e:
+            sys.exit()
 
 
 def mon ():

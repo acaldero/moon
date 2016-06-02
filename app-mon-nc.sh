@@ -15,4 +15,5 @@ fi
                                           { 
                                             print "data: " $0 "\n";
                                             fflush(); 
-                                          }' | nc -l -p $1
+                                          }' | ( nc -l -p $1 ; killall awk )
+
