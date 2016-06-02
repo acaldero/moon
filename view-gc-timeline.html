@@ -3,18 +3,23 @@
 <head>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-	    google.charts.load("current", {packages:["timeline"]});
-	    google.charts.setOnLoadCallback(onInitializeHandler);
+
+	    google.charts.load("current", {packages:["timeline"]}) ;
+	    google.charts.setOnLoadCallback(onInitializeHandler) ;
 
 	    var url = 'http://localhost:9999' ;
-	    var container = null ;
-	    var chart = null ;
 	    var dataTable = null ;
+	    var container = null ;
+
+	    var jsonStream = null ;
+            var start_time = new Date() ;
+            var options = {
+                   timeline: { colorByRowLabel: true }
+                };
 
 	    function onInitializeHandler ( ) 
 	    {
-	        container = document.getElementById('div_chart');
-	        chart = new google.visualization.Timeline(container);
+	        container = document.getElementById('div_chart') ;
 
 	        dataTable = new google.visualization.DataTable();
 	        dataTable.addColumn({ type: 'string', id: 'Position' });
@@ -23,19 +28,15 @@
 	        dataTable.addColumn({ type: 'date',   id: 'End' });
 	    }
 
-	    var jsonStream = null ;
-            var start_time = new Date() ;
-            var options = {
-                   timeline: { colorByRowLabel: true }
-                };
-
 	    function onMessageHandler ( event ) 
 	    {
 		var elto_mon = JSON.parse(event.data); 
+
 		var starting_time = new Date(0,0,0, 0,0,elto_mon.timestamp-elto_mon.timedelta,0) ;
 		var ending_time   = new Date(0,0,0, 0,0,elto_mon.timestamp,0) ;
-
 		dataTable.addRow([ elto_mon.type, elto_mon.usage.toString(10), starting_time, ending_time ]);
+
+	        var chart = new google.visualization.Timeline(container);
 		chart.draw(dataTable, options) ;
 	    }
 
@@ -52,6 +53,7 @@
                     jsonStream.close();
                 jsonStream = null;
 	    }
+
   </script>
 </head>
 
@@ -71,3 +73,4 @@
 </body>
 
 </html>
+
