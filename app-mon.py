@@ -45,8 +45,7 @@ def mon ():
 	info_time = time.time() 
 
         # 1.- Check Memory
-	meminfo = p_obj.memory_percent()
-        info_m_usage = meminfo
+        info_m_usage = p_obj.memory_percent(memtype="vms")
 
         info_delta = math.fabs(info_m_usage - last_info_m_usage) 
         if info_delta >= delta:
@@ -61,8 +60,7 @@ def mon ():
             last_info_m_usage = info_m_usage
 
         # 2.- Check CPU 
-	cpuinfo = p_obj.cpu_percent()
-        info_c_usage = cpuinfo 
+        info_c_usage = p_obj.cpu_percent()
 
         info_delta = math.fabs(info_c_usage - last_info_c_usage)
         if info_delta >= delta:
