@@ -54,7 +54,7 @@ def mon ():
                      "timestamp":     info_time,
                      "timedelta":     info_time - last_info_m_time,
                      "usagepercent":  last_info_m_usage,
-                     "usageabsolute": p_obj.memory_info()['vms'] } ; 
+                     "usageabsolute": p_obj.memory_info()[1] } ; 
             print_record(format, data)
 
             last_info_m_time  = info_time
@@ -115,14 +115,14 @@ def main(argv):
 
         # get parameters
         try:
-           opts, args = getopt.getopt(argv,"h:f:r:d:p",["format=","rate=","delta=","pid="])
+           opts, args = getopt.getopt(argv,"h:f:r:d:p:",["format=","rate=","delta=","pid="])
         except getopt.GetoptError:
-           print 'app-mon.sh -f <format> -r <rate> -d <delta> -p <pid>'
+           print 'app-mon.py -f <format> -r <rate> -d <delta> -p <pid>'
            sys.exit(2)
 
         for opt, arg in opts:
             if opt == '-h':
-               print 'app-mon.sh -f <format> -r <rate> -d <delta> -p <pid>'
+               print 'app-mon.py -f <format> -r <rate> -d <delta> -p <pid>'
                sys.exit()
             elif opt in ("-f", "--format"):
                format  = str(arg)

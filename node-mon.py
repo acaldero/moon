@@ -129,12 +129,12 @@ def main(argv):
         try:
            opts, args = getopt.getopt(argv,"h:f:r:d:",["format=","rate=","delta="])
         except getopt.GetoptError:
-           print 'node-mon.sh -f <format> -r <rate> -d <delta>'
+           print 'node-mon.py -f <format> -r <rate> -d <delta>'
            sys.exit(2)
 
         for opt, arg in opts:
             if opt == '-h':
-               print 'node-mon.sh -f <format> -r <rate> -d <delta>'
+               print 'node-mon.py -f <format> -r <rate> -d <delta>'
                sys.exit()
             elif opt in ("-f", "--format"):
                format  = str(arg)
