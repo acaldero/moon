@@ -15,7 +15,7 @@ echo "$0 running on port $PORT..."
 
 while [ 1 ]; do
 
- tail -c +0 -f strace.txt | ./strace-mon.py | ./io-csv2predot.sh | awk 'BEGIN {
+ tail -c +0 -f strace.txt | ./strace-mon.py | ./io-csv2predot.py | awk 'BEGIN {
 						    print "HTTP/1.1 200 OK";
 						    print "Access-Control-Allow-Origin: *";
 						    print "Content-Type: text/event-stream";
