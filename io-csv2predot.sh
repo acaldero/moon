@@ -15,7 +15,10 @@ counter_states = 0
 # 0 -> date (uniq)
 #counter_clusters = 0
 
-for line in sys.stdin:
+while True:
+    line = sys.stdin.readline()
+    if not line: break # EOF
+
     x1 = csv.reader(line)
     x2 = list(x1)
 
@@ -33,7 +36,7 @@ for line in sys.stdin:
 
     if l_op == 'open':
         ao[l_file]  = ['"' + l_date + '";"' + l_op + '";"' + l_duration + '";'] 
-        counter_clusters = l_date
+        counter_clusters = int(float(l_date) * 1000000)
 
     if l_op == 'openat':
         ao[l_file]  = ['"' + l_date + '";"' + l_op + '";"' + l_duration + '";'] 

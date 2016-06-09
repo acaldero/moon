@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -u
 
 #
 # strace-mon (version 2.5)
@@ -55,7 +55,9 @@ def strace2info():
 	# strace -> csv/json
 	#
 
-	for line in sys.stdin:
+	while True:
+	    line = sys.stdin.readline()
+	    if not line: break # EOF
 
 	    x = re.split(r'\s*[<>(),=\n]\s*', line)
 	    l_date = x[0].split()[0]
