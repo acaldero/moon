@@ -1,4 +1,5 @@
 #!/bin/sh
+#set -x
 
 if [ $# -gt 1 ]; then
    echo "Usage: $0 <port>"
@@ -23,8 +24,13 @@ while [ 1 ]; do
 						    print "";
 						  }
 						  {
-						    print "data: " $0 ;
-						    fflush();
+                                                    if ($1 == "}") {
+						        print "data: }\n" ;
+						        fflush();
+                                                    } else {
+						        print "data: " $0 ;
+						        fflush();
+                                                    }
 						  }
                                                   END {
 						    print "\n";
