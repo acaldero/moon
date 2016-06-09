@@ -35,7 +35,7 @@ while [ 1 ]; do
                                                   END {
 						    print "\n";
 						    fflush();
-                                                  }' | ( nc -l -p $PORT )
+						  }' | ( nc -l -p $PORT ; killall tail )
 
 done
 
