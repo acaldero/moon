@@ -58,7 +58,7 @@
 		jsonStream = new EventSource(url) ;
                 jsonStream.addEventListener('error', 
                                             function (e) { 
-                                                alert('Unable to connect: ' + url); 
+                                                console.log('connection closed: ' + url); 
                                                 StopDrawing(); 
                                             }, false) ;
                 jsonStream.addEventListener('message', onMessageHandler) ;
