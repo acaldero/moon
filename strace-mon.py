@@ -155,7 +155,7 @@ def strace2info():
 		   continue
 
 		ao[key] += [ data ]
-		ak[key] += ("type","date","duration","op","key","dest")
+		ok[key] += [ ("type","date","duration","op","key","dest") ]
 
 
 	    #
