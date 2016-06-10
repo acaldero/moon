@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <script src="vis.js"></script>
+    <script src="http://visjs.org/dist/vis.js"></script>
     <script type="text/javascript">
 
 	    var url = 'http://localhost:9999' ;
@@ -17,6 +17,8 @@
             var options = {
               stack: false,
               editable: true,
+	      start: new Date(),
+	      end: new Date(1000*60*60*24 + (new Date()).valueOf()),
               margin: {
                 item: 10, // minimal margin between items
                 axis: 5   // minimal margin between items and the axis
@@ -49,13 +51,6 @@
                     fileId++;
 		}
 
-// +"name": "/lib/x86_64-linux-gnu/libtinfo.so.5",
-// *"duration": "0.000011",
-// +"amount": "832",
-// *"date": "0.000077",
-// +"type": "disk",
-// *"op": "read",
-
 		pos = fileNames.indexOf(elto_name) ;
 	  	items_neltos = items.length;
                 for (i=0; i<elto_mon.length; i++) 
@@ -65,10 +60,10 @@
                          info = elto_mon[i].op + ' ' + elto_mon[i].amount + ' bytes' ;
 
 	             items.add({
-	  	         id: items_neltos + i,
+	  	         id:    items_neltos + i,
 	  	         group: pos,
-		         start: parseInt(elto_mon[i].date),
-		         end: parseInt(elto_mon[i].date) + parseInt(elto_mon[i].duration),
+		         start: new Date(1000*parseFloat(elto_mon[i].date)),
+		         end:   new Date(1000*parseFloat(elto_mon[i].date) + 1000*parseFloat(elto_mon[i].duration)),
 		         content: info
 	             });
                 }
