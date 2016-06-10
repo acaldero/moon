@@ -278,6 +278,34 @@ def strace2info():
 		ao[key] = [] 
 		ok[key] = [] 
 
+
+	    if l_op == 'dup2':
+		try:
+		   key1 = int(x[1])
+		   key2 = int(x[2])
+		   if key1 not in ao:
+		      continue
+
+                   data = { "type":      ak[key1],
+                            "date":      l_date,
+                            "duration":  x[-2],
+                            "op":        l_op,
+                            "name":      an[key1] } ; 
+		except ValueError:
+		   continue
+		except KeyError:
+		   continue
+
+		ao[key1] += [ data ]
+		ok[key1] += [ ("type","date","duration","op","name") ]
+
+                print_records(format, ao[key1], ok[key1])
+
+		ak[key2] = ak[key1]
+		an[key2] = an[key1]
+		ao[key2] = ao[key1]
+		ok[key2] = ok[key1] 
+
 	# print "\n"
 
 	for key in ao:

@@ -87,14 +87,14 @@
                 {
                      var info = elto_mon[i].op ;
                      if ( ("read" == elto_mon[i].op) || ("write" == elto_mon[i].op) )
-                         info = elto_mon[i].op + ' ' + elto_mon[i].amount + ' bytes' ;
+                          info = elto_mon[i].op + ' ' + elto_mon[i].amount + ' bytes' ;
 
 		     var item_start_time = new Date(dy + '-' + dm + '-' + dd + ' ' + elto_mon[i].date) ;
-                     if (item_start_time < startTime) 
+                     if (item_start_time < options.start) 
                          options.start = item_start_time ;
 
-		     var item_end_time   = new Date(item_start_time.getTime() + 1000*parseFloat(elto_mon[i].duration)) ;
-                     if (item_end_time > endTime) 
+		     var item_end_time = new Date(item_start_time.getTime() + 1000*parseFloat(elto_mon[i].duration)) ;
+                     if (item_end_time > options.end) 
                          options.end   = item_end_time ;
 
 	             items.add({ id: items_neltos+i, group: pos, start: item_start_time, end: item_end_time, content: info });
