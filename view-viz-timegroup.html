@@ -18,10 +18,12 @@
 	    var timeline = null ;
             var options  = {
               stack: false,
+	      showCurrentTime: false,
 	      start: startTime,
-	      end: new Date(10*60*60*24 + startTime.valueOf()),
+	      end: new Date(60*60 + startTime.valueOf()),
               editable: false,
               zoomable: true,
+	      moveable: true,
               autoResize: true,
               margin: {
                 item: 10, // minimal margin between items
@@ -55,6 +57,10 @@
                     fileId++;
 		}
 
+                var dy = startTime.getFullYear() ;
+                var dm = startTime.getMonth() ;
+                var dd = startTime.getDay() ;
+
 		pos = fileNames.indexOf(elto_name) ;
 	  	items_neltos = items.length;
                 for (i=0; i<elto_mon.length; i++) 
@@ -63,15 +69,10 @@
                      if ( ("read" == elto_mon[i].op) || ("write" == elto_mon[i].op) )
                          info = elto_mon[i].op + ' ' + elto_mon[i].amount + ' bytes' ;
 
-		     var item_start_time = startTime.getTime() + parseFloat(elto_mon[i].date) ;
+		     var item_start_time = new Date(dy + '-' + dm + '-' + dd + ' ' + elto_mon[i].date) ;
+		     var item_end_time   = new Date(item_start_time.getTime() + 1000*parseFloat(elto_mon[i].duration)) ;
 
-	             items.add({
-	  	         id:    items_neltos + i,
-	  	         group: pos,
-		         start: new Date(item_start_time),
-		         end:   new Date(item_start_time + parseFloat(elto_mon[i].duration)),
-		         content: info
-	             });
+	             items.add({ id: items_neltos+i, group: pos, start: item_start_time, end: item_end_time, content: info });
                 }
 
 	        if (null == timeline) {
@@ -110,14 +111,14 @@
 </head>
 
 <body>
-  <table border="0" width="100%" cellpadding=10 cellspacing=10>
+  <table border="0" width="100%" cellpadding=10 cellspacing=10 bgcolor="#F8F8F8">
     <tr align=right>
       <td width="80%"> <input  oninput="url=this.value;" type="text" id="input1" value="http://localhost:9999" size="50"> </td>
       <td width="5%">  <button onclick="StopDrawing()">Stop</button> </td>
       <td width="5%">  <button onclick="StartDrawing()">Start</button> </td>
     </tr>
     <tr>
-      <td colspan="3" bgcolor="#E8E8E8">
+      <td colspan="3">
       <div id="div_chart" style="height: 500px;"></div>
       </td>
     </tr>
