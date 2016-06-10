@@ -1,0 +1,119 @@
+<html>
+
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+
+	    google.charts.load("current", {packages:["timeline"]}) ;
+	    google.charts.setOnLoadCallback(onInitializeHandler) ;
+
+	    var url = 'http://localhost:9999' ;
+	    var dataTable = null ;
+	    var container = null ;
+
+            var startTime = new Date();
+
+	    var jsonStream = null ;
+            var options = {
+                    timeline: { colorByRowLabel: true }
+                };
+
+	    function onInitializeHandler ( ) 
+	    {
+	        container = document.getElementById('div_chart') ;
+
+	        dataTable = new google.visualization.DataTable();
+	        dataTable.addColumn({ type: 'string', id: 'Position' });
+	        dataTable.addColumn({ type: 'string', id: 'Name' });
+	        dataTable.addColumn({ type: 'date',   id: 'Start' });
+	        dataTable.addColumn({ type: 'date',   id: 'End' });
+	    }
+
+            function onMessageHandler_bottomHalf ( )
+            {
+                var chart = new google.visualization.Timeline(container) ;
+                chart.draw(dataTable, options) ;
+            }
+
+	    function onMessageHandler ( event ) 
+	    {
+                var elto_mon = JSON.parse(event.data);
+
+                // getting the fileName...
+                elto_name = null;
+                for (i=0; i<elto_mon.length; i++) {
+                     if ("disk" == elto_mon[i].type)
+                     if (typeof elto_mon[i].name !== "undefined") {
+                         elto_name = elto_mon[i].name ;
+                         break;
+                     }
+                }
+                if (null == elto_name)
+                    return;
+
+                // insert events...
+                var dy = startTime.getFullYear() ;
+                var dm = startTime.getMonth() ;
+                var dd = startTime.getDay() ;
+
+                for (var i=0; i<elto_mon.length; i++) 
+                {
+                     var info = elto_mon[i].op ;
+                     if ( ("read" == elto_mon[i].op) || ("write" == elto_mon[i].op) )
+                           info = elto_mon[i].op + ' ' + elto_mon[i].amount + ' bytes' ;
+
+		     var item_start_time = new Date(dy + '-' + dm + '-' + dd + ' ' + elto_mon[i].date) ;
+		     var item_end_time   = new Date(item_start_time.getTime() + 1000*parseFloat(elto_mon[i].duration)) ; // * -> /
+
+                     dataTable.addRow([ elto_name, info, item_start_time, item_end_time ]);
+                     // console.log(item_start_time + '-' + item_end_time + ':' + info + ' -> ' + elto_name);
+                }
+
+                setTimeout(onMessageHandler_bottomHalf, 500) ;
+	    }
+
+	    function StartDrawing ( ) 
+	    {
+                if (null != jsonStream)
+                    return;
+
+		jsonStream = new EventSource(url) ;
+                jsonStream.addEventListener('error', 
+                                            function (e) { 
+                                                console.log('connection closed: ' + url); 
+                                                StopDrawing(); 
+                                            }, false) ;
+                jsonStream.addEventListener('message', onMessageHandler) ;
+	    }
+
+	    function StopDrawing ( ) 
+	    {
+                if (null == jsonStream)
+                    return;
+
+                jsonStream.close() ;
+                jsonStream = null ;
+	    }
+
+  </script>
+</head>
+
+<body>
+  <table border="0" width="100%" height="100%" cellpadding=10 cellspacing=10 bgcolor="#E8E8E8">
+    <tr height="10%" align="right">
+      <td width="80%"> <input oninput="url=this.value;" type="text" id="input1" value="http://localhost:9999" size="50"> </td>
+      <td width="5%">  <button onclick="StopDrawing()">Stop</button> </td>
+      <td width="5%">  <button onclick="StartDrawing()">Start</button> </td>
+    </tr>
+    <tr height="90%">
+      <td colspan="3">
+      <div id="div_scroll" style="height:100%; width: 100%; overflow: auto;">
+           <div id="div_chart" style="width:105%; height:100%;"></div>
+      </div>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>
+

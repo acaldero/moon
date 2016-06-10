@@ -93,7 +93,7 @@
                      if (item_start_time < options.start) 
                          options.start = item_start_time ;
 
-		     var item_end_time = new Date(item_start_time.getTime() + 1000*parseFloat(elto_mon[i].duration)) ;
+		     var item_end_time = new Date(item_start_time.getTime() + 1000*parseFloat(elto_mon[i].duration)) ; // * -> /
                      if (item_end_time > options.end) 
                          options.end   = item_end_time ;
 
