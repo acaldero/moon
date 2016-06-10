@@ -4,6 +4,7 @@ import os
 import re 
 import sys
 import csv
+import datetime
 
 ao = {} 
 ao[0] = []
@@ -36,7 +37,7 @@ while True:
 
     if l_op == 'open':
         ao[l_file]  = ['"' + l_date + '";"' + l_op + '";"' + l_duration + '";'] 
-        counter_clusters = int(float(l_date) * 1000000)
+        counter_clusters = datetime.datetime.strptime(l_date, "%H:%M:%S.%f").strftime("%H%M%S%f")
 
     if l_op == 'openat':
         ao[l_file]  = ['"' + l_date + '";"' + l_op + '";"' + l_duration + '";'] 
