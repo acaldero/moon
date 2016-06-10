@@ -1,0 +1,123 @@
+<html>
+
+<head>
+    <script src="http://visjs.org/dist/vis.js"></script>
+    <script type="text/javascript">
+
+	    var url = 'http://localhost:9999' ;
+	    var container = null ;
+	    var jsonStream = null ;
+
+            var fileNames = [] ;
+            var fileId    = 0 ;
+            var fileTags  = [] ;
+            var groups    = new vis.DataSet(fileTags);
+            var items     = new vis.DataSet();
+
+            var options = {
+              stack: false,
+              editable: true,
+              margin: {
+                item: 10, // minimal margin between items
+                axis: 5   // minimal margin between items and the axis
+              },
+              orientation: 'top'
+            };
+
+	    function onMessageHandler ( event ) 
+	    {
+                var elto_mon = JSON.parse(event.data);
+
+                // getting the fileName...
+                elto_name = null;
+                for (i=0; i<elto_mon.length; i++) {
+                     if ("disk" == elto_mon[i].type)
+                     if (typeof elto_mon[i].name !== "undefined") {
+                         elto_name = elto_mon[i].name ;
+                         break;
+                     }
+                }
+                if (null == elto_name)
+                    return;
+
+                // if fileName is not in the array, add it...
+		var pos = fileNames.indexOf(elto_name) ;
+		if (pos < 0) {
+                    fileNames.push(elto_name);
+                    fileTags.push({id: fileId, content: elto_name});
+                    groups = new vis.DataSet(fileTags);
+                    fileId++;
+		}
+
+// +"name": "/lib/x86_64-linux-gnu/libtinfo.so.5",
+// *"duration": "0.000011",
+// +"amount": "832",
+// *"date": "0.000077",
+// +"type": "disk",
+// *"op": "read",
+
+	  	items_neltos = items.length;
+                for (i=0; i<elto_mon.length; i++) 
+                {
+                     var info = elto_mon[i].op ;
+                     if ( ("read" == elto_mon[i].op) || ("write" == elto_mon[i].op) )
+                         info = elto_mon[i].op + ' ' + elto_mon[i].amount + ' bytes' ;
+
+	             items.add({
+	  	         id: items_neltos + i,
+	  	         group: pos,
+		         start: elto_mon[i].date,
+		         end: elto_mon[i].date + elto_mon[i].duration,
+		         content: info
+	             });
+                }
+
+                container = document.getElementById('div_chart') ;
+	        timeline = new vis.Timeline(container, null, options);
+	        timeline.setGroups(groups);
+	        timeline.setItems(items);
+	    }
+
+	    function StartDrawing ( ) 
+	    {
+                if (null != jsonStream)
+                    return;
+
+		jsonStream = new EventSource(url) ;
+                jsonStream.addEventListener('error', 
+                                            function (e) { 
+                                                console.log('connection closed: ' + url); 
+                                                StopDrawing(); 
+                                            }, false) ;
+                jsonStream.addEventListener('message', onMessageHandler) ;
+	    }
+
+	    function StopDrawing ( ) 
+	    {
+                if (null == jsonStream)
+                    return;
+
+                jsonStream.close() ;
+                jsonStream = null ;
+	    }
+
+  </script>
+</head>
+
+<body>
+  <table border="0" width="100%" cellpadding=10 cellspacing=10>
+    <tr align=right>
+      <td width="80%"> <input  oninput="url=this.value;" type="text" id="input1" value="http://localhost:9999" size="50"> </td>
+      <td width="5%">  <button onclick="StopDrawing()">Stop</button> </td>
+      <td width="5%">  <button onclick="StartDrawing()">Start</button> </td>
+    </tr>
+    <tr>
+      <td colspan="3" bgcolor="#E8E8E8">
+      <div id="div_chart" style="height: 500px;"></div>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>
+
