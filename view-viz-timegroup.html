@@ -14,13 +14,14 @@
             var groups    = new vis.DataSet(fileTags);
             var items     = new vis.DataSet();
 	    var startTime = new Date();
+	    var endTime   = new Date(60 + startTime.valueOf());
 
 	    var timeline = null ;
             var options  = {
               stack: false,
 	      showCurrentTime: false,
 	      start: startTime,
-	      end: new Date(60*60 + startTime.valueOf()),
+	      end:   endTime,
               editable: false,
               zoomable: true,
 	      moveable: true,
@@ -31,6 +32,25 @@
               },
               orientation: 'top'
             };
+
+	    function onMessageHandler_bottomHalf ( ) 
+	    {
+	        if (null == timeline) 
+                {
+                    container = document.getElementById('div_chart') ;
+	            timeline = new vis.Timeline(container, null, options);
+		    timeline.on('select', function (properties) {
+		                                for (var i=0; i<properties.items.length; i++) {
+                                                     var elto = items._data[properties.items[i]] ;
+		                                     alert(elto.start + ': ' + elto.content);
+                                                }
+		                          });
+                }
+
+	        timeline.setOptions(options);
+	        timeline.setGroups(groups);
+	        timeline.setItems(items);
+	    }
 
 	    function onMessageHandler ( event ) 
 	    {
@@ -70,17 +90,17 @@
                          info = elto_mon[i].op + ' ' + elto_mon[i].amount + ' bytes' ;
 
 		     var item_start_time = new Date(dy + '-' + dm + '-' + dd + ' ' + elto_mon[i].date) ;
+                     if (item_start_time < startTime) 
+                         options.start = item_start_time ;
+
 		     var item_end_time   = new Date(item_start_time.getTime() + 1000*parseFloat(elto_mon[i].duration)) ;
+                     if (item_end_time > endTime) 
+                         options.end   = item_end_time ;
 
 	             items.add({ id: items_neltos+i, group: pos, start: item_start_time, end: item_end_time, content: info });
                 }
 
-	        if (null == timeline) {
-                    container = document.getElementById('div_chart') ;
-	            timeline = new vis.Timeline(container, null, options);
-                }
-	        timeline.setGroups(groups);
-	        timeline.setItems(items);
+		setTimeout(onMessageHandler_bottomHalf, 1000) ;
 	    }
 
 	    function StartDrawing ( ) 
