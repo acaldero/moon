@@ -56,6 +56,7 @@
 // +"type": "disk",
 // *"op": "read",
 
+		pos = fileNames.indexOf(elto_name) ;
 	  	items_neltos = items.length;
                 for (i=0; i<elto_mon.length; i++) 
                 {
@@ -66,8 +67,8 @@
 	             items.add({
 	  	         id: items_neltos + i,
 	  	         group: pos,
-		         start: elto_mon[i].date,
-		         end: elto_mon[i].date + elto_mon[i].duration,
+		         start: parseInt(elto_mon[i].date),
+		         end: parseInt(elto_mon[i].date) + parseInt(elto_mon[i].duration),
 		         content: info
 	             });
                 }
