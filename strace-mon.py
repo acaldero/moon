@@ -290,7 +290,7 @@ def main(argv):
 
         # get parameters
         try:
-           opts, args = getopt.getopt(argv,"h:f",["format="])
+           opts, args = getopt.getopt(argv,"h:f:",["format="])
         except getopt.GetoptError:
            print 'strace2csv.sh -f <format>'
            sys.exit(2)
