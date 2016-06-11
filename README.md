@@ -27,7 +27,7 @@ B.- Application monitoring
  
 C.- Strace monitoring
 
-    Local  monitoring:
+    Local monitoring:
        1) ./strace.sh <application and parameters> &
        2) tail -c +0 -f strace.txt | ./strace-mon.py 
        
