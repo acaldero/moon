@@ -1,7 +1,7 @@
 #!/usr/bin/python -u
 
 #
-# strace-mon (version 2.5)
+# Strace Monitoring (version 2.5)
 # Alejandro Calderon @ ARCOS.INF.UC3M.ES
 # GPL 3.0
 #

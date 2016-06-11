@@ -1,4 +1,11 @@
 #!/bin/sh
+#set -x
+
+#
+# Node Monitoring NetCat (version 1.0)
+# Alejandro Calderon @ ARCOS.INF.UC3M.ES
+# GPL 3.0
+#
 
 if [ $# -gt 1 ]; then
    echo "Usage: $0 <port>"
