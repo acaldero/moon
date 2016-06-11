@@ -2,8 +2,10 @@
 Monitoring tools 
 
 A.- Node monitoring
+
     Local monitoring:
        1) ./node-mon.py
+       
     Remote monitoring:
        1) ./node-mon-nc.sh &
        2) firefox view-gc-timeline.html &
@@ -11,8 +13,10 @@ A.- Node monitoring
        4) click on the 'start' button
  
 B.- Application monitoring
+
     Local monitoring:
        1) ./app-mon.py
+       
     Remote monitoring:
        1) ./app-mon-nc.sh <pid> &
        2) firefox view-gc-timeline.html &
@@ -21,6 +25,7 @@ B.- Application monitoring
  <pid> has to be a valid process identification (pid).
  
 C.- Strace monitoring
+
     Remote monitoring (a):
        1) ./strace-mon-nc.sh &
        2) firefox view-gc-timeline-strace.html &
