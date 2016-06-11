@@ -22,7 +22,7 @@ B.- Application monitoring
        2) firefox view-gc-timeline.html &
        3) click on the 'start' button 
  
- <pid> has to be a valid process identification (pid).
+    <pid> has to be a valid process identification (pid).
  
 C.- Strace monitoring
 
@@ -36,5 +36,5 @@ C.- Strace monitoring
        2) firefox view-viz-timegroup-strace.html &
        3) click on the 'start' button
 
- Both options are valid (Google Chart or Viz.js)
+    Both options are valid (Google Chart or Viz.js)
  
