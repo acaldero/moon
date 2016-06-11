@@ -27,14 +27,16 @@ B.- Application monitoring
 C.- Strace monitoring
 
     Remote monitoring (a):
-       1) ./strace-mon-nc.sh &
-       2) firefox view-gc-timeline-strace.html &
-       3) click on the 'start' button
+       1) ./strace.sh <application and parameters> &
+       2) ./strace-mon-nc.sh &
+       3) firefox view-gc-timeline-strace.html &
+       4) click on the 'start' button
 
     Remote monitoring (b):
-       1) ./strace-mon-nc.sh &
-       2) firefox view-viz-timegroup-strace.html &
-       3) click on the 'start' button
+       1) ./strace.sh <application and parameters> &
+       2) ./strace-mon-nc.sh &
+       3) firefox view-viz-timegroup-strace.html &
+       4) click on the 'start' button
 
     Both options are valid (Google Chart or Viz.js)
  
