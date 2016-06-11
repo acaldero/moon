@@ -13,8 +13,10 @@
 
 	    var jsonStream = null ;
             var options = {
-                   timeline: { colorByRowLabel: true }
+                    width: 0.9*window.innerWidth,
+                    timeline: { colorByRowLabel: true }
                 };
+            var bhto = -1 ;
 
 	    function onInitializeHandler ( ) 
 	    {
@@ -26,6 +28,14 @@
 	        dataTable.addColumn({ type: 'date',   id: 'Start' });
 	        dataTable.addColumn({ type: 'date',   id: 'End' });
 	    }
+
+            function onMessageHandler_bottomHalf ( )
+            {
+	        var chart = new google.visualization.Timeline(container) ;
+		chart.draw(dataTable, options) ;
+
+                bhto = -1 ;
+            }
 
 	    function onMessageHandler ( event ) 
 	    {
@@ -46,8 +56,8 @@
 
 		dataTable.addRow([ elto_mon.type, usage_hr, starting_time, ending_time ]);
 
-	        var chart = new google.visualization.Timeline(container) ;
-		chart.draw(dataTable, options) ;
+                if (bhto < 0)
+                    bhto = setTimeout(onMessageHandler_bottomHalf, 50) ;
 	    }
 
 	    function StartDrawing ( ) 
@@ -73,19 +83,39 @@
                 jsonStream = null ;
 	    }
 
+            function ZoomIn ( )
+            {
+                if (null == jsonStream)
+                    return;
+
+                options.width += 500 ;
+                onMessageHandler_bottomHalf();
+            }
+
+            function ZoomOut ( )
+            {
+                if (null == jsonStream)
+                    return;
+
+                options.width -= 500 ;
+                onMessageHandler_bottomHalf();
+            }
+
   </script>
 </head>
 
 <body>
   <table border="0" width="100%" cellpadding=10 cellspacing=10>
-    <tr align=right>
+    <tr height="10%" align="right">
+      <td width="5%">  <button onclick="ZoomOut()">-</button> </td>
+      <td width="5%">  <button onclick="ZoomIn()">+</button> </td>
       <td width="80%"> <input oninput="url=this.value;" type="text" id="input1" value="http://localhost:9999" size="50"> </td>
       <td width="5%">  <button onclick="StopDrawing()">Stop</button> </td>
       <td width="5%">  <button onclick="StartDrawing()">Start</button> </td>
     </tr>
-    <tr>
-      <td colspan="3" bgcolor="#E8E8E8">
-      <div id="div_chart" style="height: 500px;"></div>
+    <tr height="90%">
+      <td colspan="5" align="center">
+          <div id="div_chart" style="position:absolute; width:100%; height:100%;"></div>
       </td>
     </tr>
   </table>
