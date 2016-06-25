@@ -8,7 +8,7 @@ A.- Node monitoring
        
     Remote monitoring:
        1) ./node-mon-nc.sh &
-       2) firefox view-gc-timeline.html &
+       2) firefox view-gc-timeline-live.html &
        3) Fill the IP address and the port (default 9999)
        4) click on the 'start' button
  
@@ -19,7 +19,7 @@ B.- Application monitoring
        
     Remote monitoring:
        1) ./app-mon-nc.sh <pid> &
-       2) firefox view-gc-timeline.html &
+       2) firefox view-gc-timeline-live.html &
        3) Fill the IP address and the port (default 9999)
        4) click on the 'start' button 
  
@@ -34,14 +34,14 @@ C.- Strace monitoring
     Remote monitoring (a):
        1) ./strace.sh <application and parameters> &
        2) ./strace-mon-nc.sh &
-       3) firefox view-gc-timeline-strace.html &
+       3) firefox view-gc-timeline-strace-live.html &
        4) Fill the IP address and the port (default 9999)
        5) click on the 'start' button
 
     Remote monitoring (b):
        1) ./strace.sh <application and parameters> &
        2) ./strace-mon-nc.sh &
-       3) firefox view-viz-timegroup-strace.html &
+       3) firefox view-viz-timegroup-strace-live.html &
        4) Fill the IP address and the port (default 9999)
        5) click on the 'start' button
 
