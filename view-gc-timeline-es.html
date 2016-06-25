@@ -1,0 +1,141 @@
+<html>
+
+<head>
+  <script type="text/javascript" src="//okfnlabs.org/recline/vendor/jquery/1.7.1/jquery.js"></script>
+  <script type="text/javascript" src="//www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+
+	    google.charts.load("current", {packages:["timeline"]}) ;
+	    google.charts.setOnLoadCallback(onInitializeHandler) ;
+
+	    var endPoint = 'http://localhost:9200/moon/nodemon' ;
+	    var dataTable = null ;
+	    var container = null ;
+
+	    var jsonTable  = null ;
+	    var jsonOffset = 0 ;
+            var options = {
+                    width: 0.9*window.innerWidth,
+                    timeline: { colorByRowLabel: true }
+                };
+
+	    function onInitializeHandler ( ) 
+	    {
+	        container = document.getElementById('div_chart') ;
+	    }
+
+	    function onDataHandler ( elto_mon ) 
+	    {
+                var starting_time = new Date(1000*elto_mon.timestamp - 1000*elto_mon.timedelta) ;
+                var ending_time   = new Date(1000*elto_mon.timestamp) ;
+
+                var usage_hr = 'unknown' ;
+                if ("compute" == elto_mon.type)
+                         usage_hr =  elto_mon.usagepercent + '%';
+                else if (elto_mon.usageabsolute > 1024*1024)
+                         usage_hr = Math.floor(elto_mon.usageabsolute / (1024*1024)) + ' MiB';
+                else if (elto_mon.usageabsolute > 1024)
+                         usage_hr = Math.floor(elto_mon.usageabsolute / (1024)) + ' KiB';
+                else if (elto_mon.usageabsolute < 1024)
+                         usage_hr = Math.floor(elto_mon.usageabsolute) + ' bytes';
+
+		dataTable.addRow([ elto_mon.type, usage_hr, starting_time, ending_time ]);
+	    }
+
+            function requestData ( )
+            {
+                $.ajax({
+                    type: 'GET',
+                    url: endPoint + '/_search?*:*&size=10&from='+jsonOffset,
+                    crossDomain: true,
+                    dataType: 'json',
+                    success: function(data, textStatus, jqXHR)
+                    {
+			    if (0 == data.hits.hits.length) {
+				alert('no more data is available');
+				return;
+			    }
+
+			    dataTable = new google.visualization.DataTable();
+			    dataTable.addColumn({ type: 'string', id: 'Position' });
+			    dataTable.addColumn({ type: 'string', id: 'Name' });
+			    dataTable.addColumn({ type: 'date',   id: 'Start' });
+			    dataTable.addColumn({ type: 'date',   id: 'End' });
+
+			    for (var i=0; i<data.hits.hits.length; i++) 
+				 onDataHandler(data.hits.hits[i]._source);
+
+			    var chart = new google.visualization.Timeline(container) ;
+			    chart.draw(dataTable, options) ;
+                    }
+                });
+            }
+
+
+	    function StartDrawing ( ) 
+	    {
+                if (null != jsonTable)
+                    return;
+
+                jsonTable = new Object();
+                requestData() ;
+	    }
+
+	    function StopDrawing ( ) 
+	    {
+                if (null == jsonTable)
+                    return;
+
+                jsonTable  = null ;
+		jsonOffset = 0 ;
+	    }
+
+            function Next ( )
+            {
+                if (null == jsonTable)
+                    return;
+
+                jsonOffset += 10;
+                requestData() ;
+            }
+
+            function Prev ( )
+            {
+                if (null == jsonTable)
+                    return;
+
+                jsonOffset -= 10;
+                if (jsonOffset < 0) {
+                    jsonOffset = 0;
+	    	    alert('no more data is available');
+		    return;
+	        }
+
+                requestData() ;
+            }
+
+  </script>
+</head>
+
+<body>
+  <table border="0" width="100%" height="100%" cellpadding=10 cellspacing=10>
+    <tr height="10%" align="right">
+      <td width="6%">  <button onclick="Prev()">&lt;-</button> </td>
+      <td width="6%">  <button onclick="Next()">-&gt;</button> </td>
+      <td width="80%"> <input  oninput="endPoint=this.value;" type="text" id="input1" value="http://localhost:9200/moon/nodemon" size="50"> </td>
+      <td width="5%">  <button onclick="StopDrawing()">Stop</button> </td>
+      <td width="5%">  <button onclick="StartDrawing()">Start</button> </td>
+    </tr>
+    <tr height="80%">
+      <td colspan="5" align="center">
+          <div id="div_chart" style="position:absolute; width:100%; height:100%;"></div>
+      </td>
+    </tr>
+    <tr height="10%" align="right">
+      <td colspan="5">(GPL 3.0) Alejandro Calderon Mateos (<a href="https://github.com/acaldero/moon">https://github.com/acaldero/moon</a>)</td>
+    </tr>
+  </table>
+</body>
+
+</html>
+
