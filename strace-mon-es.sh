@@ -15,14 +15,14 @@ fi
 if [ $# -eq 1 ]; then
    PORT=$1
 else
-   PORT=9999
+   PORT=9200
 fi
 
 echo "$0 running on port $PORT..."
 
 while [ 1 ]; do
 
- tail -c +0 -f strace.txt | ./strace-mon.py -f json | awk -v port="$PORT" '{
+ tail -c +0 -f strace.txt | ./strace-mon.py -f json | jq --unbuffered -c '.[]' | awk -v port="$PORT" '{
                                                  print "curl -XPOST http://localhost:"port"/moon/strace/?pretty=true -d \x27"$0"\x27\n";
 						 fflush();
 					    }' | sh

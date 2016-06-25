@@ -2,15 +2,17 @@
 
 <head>
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.x-git.min.js"></script>
-  <script type="text/javascript" src="http://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
 
 	    google.charts.load("current", {packages:["timeline"]}) ;
 	    google.charts.setOnLoadCallback(onInitializeHandler) ;
 
-	    var endPoint = 'http://localhost:9200/moon/nodemon' ;
+	    var endPoint = 'http://localhost:9200/moon/strace' ;
 	    var dataTable = null ;
 	    var container = null ;
+
+            var startTime = new Date();
 
 	    var jsonTable  = null ;
 	    var jsonOffset = 0 ;
@@ -26,20 +28,29 @@
 
 	    function onDataHandler ( elto_mon ) 
 	    {
-                var starting_time = new Date(1000*elto_mon.timestamp - 1000*elto_mon.timedelta) ;
-                var ending_time   = new Date(1000*elto_mon.timestamp) ;
+                // getting the fileName...
+                if (typeof elto_mon.name !== "undefined") 
+                     elto_name = elto_mon.name ;
+                else return;
 
-                var usage_hr = 'unknown' ;
-                if ("compute" == elto_mon.type)
-                         usage_hr =  elto_mon.usagepercent + '%';
-                else if (elto_mon.usageabsolute > 1024*1024)
-                         usage_hr = Math.floor(elto_mon.usageabsolute / (1024*1024)) + ' MiB';
-                else if (elto_mon.usageabsolute > 1024)
-                         usage_hr = Math.floor(elto_mon.usageabsolute / (1024)) + ' KiB';
-                else if (elto_mon.usageabsolute < 1024)
-                         usage_hr = Math.floor(elto_mon.usageabsolute) + ' bytes';
+                // insert events...
+                var dy = startTime.getFullYear() ;
+                var dm = startTime.getMonth() ;
+                var dd = startTime.getDay() ;
 
-		dataTable.addRow([ elto_mon.type, usage_hr, starting_time, ending_time ]);
+                var info = elto_mon.op ;
+                if ( ("read" == elto_mon.op) || ("write" == elto_mon.op) )
+                      info = elto_mon.op + ' ' + elto_mon.amount + ' bytes' ;
+
+		//var item_start_time = new Date(dy + '-' + dm + '-' + dd + ' ' + elto_mon.date) ;
+		//var item_end_time   = new Date(item_start_time.getTime() + 1000*parseFloat(elto_mon.duration)) ; // * -> /
+
+                // Thanks to Jaime Pons Bailly-Bailliere!
+		var item_start_time = new Date(0);
+		var item_end_time   = new Date(1000*parseFloat(elto_mon.duration)) ; // * -> /
+
+                dataTable.addRow([ elto_name, info, item_start_time, item_end_time ]);
+                // console.log(item_start_time + '-' + item_end_time + ':' + info + ' -> ' + elto_name);
 	    }
 
             function requestData ( )
@@ -62,11 +73,13 @@
 			    dataTable.addColumn({ type: 'date',   id: 'Start' });
 			    dataTable.addColumn({ type: 'date',   id: 'End' });
 
+	                    var loader = document.getElementById('div_loader') ;
+		            loader.style.display = 'block'; // Show
 			    for (var i=0; i<data.hits.hits.length; i++) 
 				 onDataHandler(data.hits.hits[i]._source);
-
 			    var chart = new google.visualization.Timeline(container) ;
 			    chart.draw(dataTable, options) ;
+			    loader.style.display = 'none';  // Hide
                     }
                 });
             }
@@ -114,27 +127,34 @@
                 requestData() ;
             }
 
+
   </script>
 </head>
 
 <body>
-  <table border="0" width="100%" height="100%" cellpadding=10 cellspacing=10>
+  <table border="0" width="100%" height="100%" cellpadding=10 cellspacing=10 bgcolor="#E8E8E8">
     <tr height="10%" align="right">
       <td width="6%">  <button onclick="Prev()">&lt;-</button> </td>
       <td width="6%">  <button onclick="Next()">-&gt;</button> </td>
-      <td width="80%"> <input  oninput="endPoint=this.value;" type="text" id="input1" value="http://localhost:9200/moon/nodemon" size="50"> </td>
+      <td width="80%"> <input  oninput="endPoint=this.value;" type="text" id="input1" value="http://localhost:9200/moon/strace" size="50"> </td>
       <td width="5%">  <button onclick="StopDrawing()">Stop</button> </td>
       <td width="5%">  <button onclick="StartDrawing()">Start</button> </td>
     </tr>
     <tr height="80%">
       <td colspan="5" align="center">
-          <div id="div_chart" style="position:absolute; width:100%; height:100%;"></div>
+      <div id="div_scroll" style="position:relative; height:100%; width: 100%; overflow: auto;">
+           <div id="div_chart" style="position:absolute; width:100%; height:100%;"></div>
+      </div>
       </td>
     </tr>
     <tr height="10%" align="right">
       <td colspan="5">(GPL 3.0) Alejandro Calderon Mateos (<a href="https://github.com/acaldero/moon">https://github.com/acaldero/moon</a>)</td>
     </tr>
   </table>
+
+  <div id="div_loader" style="position:fixed; top:50%; left:50%; align:center; display:none;">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" width="30%">
+  </div>
 </body>
 
 </html>
